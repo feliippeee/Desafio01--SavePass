@@ -30,15 +30,33 @@ export function Home() {
 
   async function loadData() {
     const dataKey = '@savepass:logins';
-    // Get asyncStorage data, use setSearchListData and setData
+    const response = await AsyncStorage.getItem(dataKey);
+    
+    if(response) {
+      const responseParse = JSON.parse(response);
+      setSearchListData(responseParse);
+      setData(responseParse);
+    }
   }
 
   function handleFilterLoginData() {
-    // Filter results inside data, save with setSearchListData
+      const filteredData = searchListData.filter(data => {
+        const isValid = data.service_name
+        .toLocaleLowerCase()
+        .includes(searchText.toLocaleLowerCase());
+        
+        if(isValid) {
+          return data;
+        }
+      });
+      setSearchListData(filteredData);
   }
 
   function handleChangeInputText(text: string) {
-    // Update searchText value
+    if(!text) {
+      setSearchListData(data);
+    }
+    setSearchText(text);
   }
 
   useFocusEffect(useCallback(() => {
@@ -70,7 +88,7 @@ export function Home() {
             {searchListData.length
               ? `${`${searchListData.length}`.padStart(2, '0')} ao total`
               : 'Nada a ser exibido'
-            }
+             }
           </TotalPassCount>
         </Metadata>
 
